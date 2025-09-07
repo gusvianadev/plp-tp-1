@@ -22,15 +22,50 @@ data Expr
   | Div Expr Expr
   deriving (Show, Eq)
 
--- recrExpr :: ... anotar el tipo ...
-recrExpr = error "COMPLETAR EJERCICIO 7"
+type BinFn b = b -> b -> b
 
--- foldExpr :: ... anotar el tipo ...
-foldExpr = error "COMPLETAR EJERCICIO 7"
+type PrimBinFn b = Expr -> Expr -> BinFn b
+
+recrExpr :: (Float -> b) -> (Float -> Float -> b) -> PrimBinFn b -> PrimBinFn b -> PrimBinFn b -> PrimBinFn b -> Expr -> b
+recrExpr fCte fRango fSuma fResta fMult fDiv expr = case expr of
+  Const x -> fCte x
+  Rango x y -> fRango x y
+  Suma x y -> fSuma x y (rec x) (rec y)
+  Resta x y -> fResta x y (rec x) (rec y)
+  Mult x y -> fMult x y (rec x) (rec y)
+  Div x y -> fDiv x y (rec x) (rec y)
+  where
+    rec = recrExpr fCte fRango fSuma fResta fMult fDiv
+
+foldExpr :: (Float -> b) -> (Float -> Float -> b) -> BinFn b -> BinFn b -> BinFn b -> BinFn b -> Expr -> b
+foldExpr fCte fRango fSuma fResta fMult fDiv expr = case expr of
+  Const x -> fCte x
+  Rango x y -> fRango x y
+  Suma x y -> fSuma (rec x) (rec y)
+  Resta x y -> fResta (rec x) (rec y)
+  Mult x y -> fMult (rec x) (rec y)
+  Div x y -> fDiv (rec x) (rec y)
+  where
+    rec = foldExpr fCte fRango fSuma fResta fMult fDiv
 
 -- | Evaluar expresiones dado un generador de números aleatorios
 eval :: Expr -> G Float
-eval = error "COMPLETAR EJERCICIO 8"
+eval expr gen =
+  foldExpr
+    (\x g -> (x, g))
+    (\x y g -> dameUno (x, y) g)
+    (generar (+))
+    (generar (-))
+    (generar (*))
+    (generar (/))
+    expr
+    gen
+  where
+    generar :: (Float -> Float -> Float) -> G Float -> G Float -> G Float
+    generar f genX genY g =
+      let (x, g1) = genX g
+          (y, g2) = genY g1
+       in (f x y, g2)
 
 -- | @armarHistograma m n f g@ arma un histograma con @m@ casilleros
 -- a partir del resultado de tomar @n@ muestras de @f@ usando el generador @g@.

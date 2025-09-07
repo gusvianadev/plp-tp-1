@@ -32,15 +32,17 @@ data Histograma = Histograma Float Float [Int]
 -- valores en el rango y 2 casilleros adicionales para los valores fuera del rango.
 -- Require que @l < u@ y @n >= 1@.
 vacio :: Int -> (Float, Float) -> Histograma
-vacio n (l, u) = error "COMPLETAR EJERCICIO 3"
+vacio n (l, u) = Histograma l ((u - l) / fromIntegral n) (replicate (n + 2) 0)
 
 -- | Agrega un valor al histograma.
 agregar :: Float -> Histograma -> Histograma
-agregar x _ = error "COMPLETAR EJERCICIO 4"
+agregar x (Histograma i t cs) = Histograma i t (actualizarElem pos (+ 1) cs)
+  where
+    pos = min (max 0 (floor (x / t) + 1)) (length cs)
 
 -- | Arma un histograma a partir de una lista de números reales con la cantidad de casilleros y rango indicados.
 histograma :: Int -> (Float, Float) -> [Float] -> Histograma
-histograma n r xs = error "COMPLETAR EJERCICIO 5"
+histograma n (i, t) valores = foldr (\x r -> agregar x r) (vacio n (i, t)) valores
 
 -- | Un `Casillero` representa un casillero del histograma con sus límites, cantidad y porcentaje.
 -- Invariante: Sea @Casillero m1 m2 c p@ entonces @m1 < m2@, @c >= 0@, @0 <= p <= 100@
@@ -65,4 +67,9 @@ casPorcentaje (Casillero _ _ _ p) = p
 
 -- | Dado un histograma, devuelve la lista de casilleros con sus límites, cantidad y porcentaje.
 casilleros :: Histograma -> [Casillero]
-casilleros _ = error "COMPLETAR EJERCICIO 6"
+casilleros (Histograma l u cs) = zipWith (\pos x -> Casillero (minimo pos) (maximo pos) x (porcentaje x)) [0 ..] cs
+  where
+    porcentaje :: Int -> Float
+    porcentaje x = if x == 0 then 0 else fromIntegral (sum cs) * 100 / fromIntegral x
+    minimo pos = if pos == 0 then infinitoNegativo else l + u * fromIntegral (pos - 1)
+    maximo pos = if pos == (length cs - 1) then infinitoPositivo else l + u * fromIntegral pos

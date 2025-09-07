@@ -12,28 +12,24 @@ import Util
 main :: IO ()
 main = runTestTTAndExit allTests
 
--- | Función auxiliar para marcar tests como pendientes a completar
-completar :: (HasCallStack) => Test
-completar = TestCase (assertFailure "COMPLETAR")
-
 allTests :: Test
 allTests =
   test
-    [ "Ej 1 - Util.alinearDerecha" ~: testsAlinearDerecha
-    -- "Ej 2 - Util.actualizarElem" ~: testsActualizarElem,
-    -- "Ej 3 - Histograma.vacio" ~: testsVacio,
-    -- "Ej 4 - Histograma.agregar" ~: testsAgregar,
-    -- "Ej 5 - Histograma.histograma" ~: testsHistograma,
-    -- "Ej 6 - Histograma.casilleros" ~: testsCasilleros,
-    -- "Ej 7 - Expr.recrExpr" ~: testsRecr,
-    -- "Ej 7 - Expr.foldExpr" ~: testsFold,
-    -- "Ej 8 - Expr.eval" ~: testsEval,
-    -- "Ej 9 - Expr.armarHistograma" ~: testsArmarHistograma,
-    -- "Ej 10 - Expr.evalHistograma" ~: testsEvalHistograma,
-    -- "Ej 11 - Expr.mostrar" ~: testsMostrar,
-    -- "Expr.Parser.parse" ~: testsParse,
-    -- "App.mostrarFloat" ~: testsMostrarFloat,
-    -- "App.mostrarHistograma" ~: testsMostrarHistograma
+    [ "Ej 1 - Util.alinearDerecha" ~: testsAlinearDerecha,
+      "Ej 2 - Util.actualizarElem" ~: testsActualizarElem,
+      "Ej 3 - Histograma.vacio" ~: testsVacio,
+      "Ej 4 - Histograma.agregar" ~: testsAgregar,
+      "Ej 5 - Histograma.histograma" ~: testsHistograma,
+      "Ej 6 - Histograma.casilleros" ~: testsCasilleros,
+      -- "Ej 7 - Expr.recrExpr" ~: testsRecr,
+      -- "Ej 7 - Expr.foldExpr" ~: testsFold,
+      "Ej 8 - Expr.eval" ~: testsEval
+      -- "Ej 9 - Expr.armarHistograma" ~: testsArmarHistograma,
+      -- "Ej 10 - Expr.evalHistograma" ~: testsEvalHistograma,
+      -- "Ej 11 - Expr.mostrar" ~: testsMostrar,
+      -- "Expr.Parser.parse" ~: testsParse,
+      -- "App.mostrarFloat" ~: testsMostrarFloat,
+      -- "App.mostrarHistograma" ~: testsMostrarHistograma
     ]
 
 testsAlinearDerecha :: Test
@@ -43,118 +39,114 @@ testsAlinearDerecha =
       alinearDerecha 10 "incierticalc" ~?= "incierticalc"
     ]
 
--- testsActualizarElem :: Test
--- testsActualizarElem =
---   test
---     [ actualizarElem 0 (+ 10) [1, 2, 3] ~?= [11, 2, 3],
---       actualizarElem 1 (+ 10) [1, 2, 3] ~?= [1, 12, 3],
---       completar
---     ]
---
--- testsVacio :: Test
--- testsVacio =
---   test
---     [ casilleros (vacio 1 (0, 10))
---         ~?= [ Casillero infinitoNegativo 0 0 0,
---               Casillero 0 10 0 0,
---               Casillero 10 infinitoPositivo 0 0
---             ],
---       casilleros (vacio 3 (0, 6))
---         ~?= [ Casillero infinitoNegativo 0 0 0,
---               Casillero 0 2 0 0,
---               Casillero 2 4 0 0,
---               Casillero 4 6 0 0,
---               Casillero 6 infinitoPositivo 0 0
---             ],
---       completar
---     ]
---
--- testsAgregar :: Test
--- testsAgregar =
---   let h0 = vacio 3 (0, 6)
---    in test
---         [ casilleros (agregar 0 h0)
---             ~?= [ Casillero infinitoNegativo 0 0 0,
---                   Casillero 0 2 1 100, -- El 100% de los valores están acá
---                   Casillero 2 4 0 0,
---                   Casillero 4 6 0 0,
---                   Casillero 6 infinitoPositivo 0 0
---                 ],
---           casilleros (agregar 2 h0)
---             ~?= [ Casillero infinitoNegativo 0 0 0,
---                   Casillero 0 2 0 0,
---                   Casillero 2 4 1 100, -- El 100% de los valores están acá
---                   Casillero 4 6 0 0,
---                   Casillero 6 infinitoPositivo 0 0
---                 ],
---           casilleros (agregar (-1) h0)
---             ~?= [ Casillero infinitoNegativo 0 1 100, -- El 100% de los valores están acá
---                   Casillero 0 2 0 0,
---                   Casillero 2 4 0 0,
---                   Casillero 4 6 0 0,
---                   Casillero 6 infinitoPositivo 0 0
---                 ],
---           completar
---         ]
---
--- testsHistograma :: Test
--- testsHistograma =
---   test
---     [ histograma 4 (1, 5) [1, 2, 3] ~?= agregar 3 (agregar 2 (agregar 1 (vacio 4 (1, 5)))),
---       completar
---     ]
---
--- testsCasilleros :: Test
--- testsCasilleros =
---   test
---     [ casilleros (vacio 3 (0, 6))
---         ~?= [ Casillero infinitoNegativo 0.0 0 0.0,
---               Casillero 0.0 2.0 0 0.0,
---               Casillero 2.0 4.0 0 0.0,
---               Casillero 4.0 6.0 0 0.0,
---               Casillero 6.0 infinitoPositivo 0 0.0
---             ],
---       casilleros (agregar 2 (vacio 3 (0, 6)))
---         ~?= [ Casillero infinitoNegativo 0.0 0 0.0,
---               Casillero 0.0 2.0 0 0.0,
---               Casillero 2.0 4.0 1 100.0,
---               Casillero 4.0 6.0 0 0.0,
---               Casillero 6.0 infinitoPositivo 0 0.0
---             ],
---       completar
---     ]
+testsActualizarElem :: Test
+testsActualizarElem =
+  test
+    [ actualizarElem 0 (+ 10) [1, 2, 3] ~?= [11, 2, 3],
+      actualizarElem 1 (+ 10) [1, 2, 3] ~?= [1, 12, 3]
+    ]
+
+testsVacio :: Test
+testsVacio =
+  test
+    [ casilleros (vacio 1 (0, 10))
+        ~?= [ Casillero infinitoNegativo 0 0 0,
+              Casillero 0 10 0 0,
+              Casillero 10 infinitoPositivo 0 0
+            ],
+      casilleros (vacio 3 (0, 6))
+        ~?= [ Casillero infinitoNegativo 0 0 0,
+              Casillero 0 2 0 0,
+              Casillero 2 4 0 0,
+              Casillero 4 6 0 0,
+              Casillero 6 infinitoPositivo 0 0
+            ]
+    ]
+
+testsAgregar :: Test
+testsAgregar =
+  let h0 = vacio 3 (0, 6)
+   in test
+        [ casilleros (agregar 0 h0)
+            ~?= [ Casillero infinitoNegativo 0 0 0,
+                  Casillero 0 2 1 100, -- El 100% de los valores están acá
+                  Casillero 2 4 0 0,
+                  Casillero 4 6 0 0,
+                  Casillero 6 infinitoPositivo 0 0
+                ],
+          casilleros (agregar 2 h0)
+            ~?= [ Casillero infinitoNegativo 0 0 0,
+                  Casillero 0 2 0 0,
+                  Casillero 2 4 1 100, -- El 100% de los valores están acá
+                  Casillero 4 6 0 0,
+                  Casillero 6 infinitoPositivo 0 0
+                ],
+          casilleros (agregar (-1) h0)
+            ~?= [ Casillero infinitoNegativo 0 1 100, -- El 100% de los valores están acá
+                  Casillero 0 2 0 0,
+                  Casillero 2 4 0 0,
+                  Casillero 4 6 0 0,
+                  Casillero 6 infinitoPositivo 0 0
+                ]
+        ]
+
+testsHistograma :: Test
+testsHistograma =
+  test
+    [ histograma 4 (1, 5) [1, 2, 3] ~?= agregar 3 (agregar 2 (agregar 1 (vacio 4 (1, 5))))
+    ]
+
+testsCasilleros :: Test
+testsCasilleros =
+  test
+    [ casilleros (vacio 3 (0, 6))
+        ~?= [ Casillero infinitoNegativo 0.0 0 0.0,
+              Casillero 0.0 2.0 0 0.0,
+              Casillero 2.0 4.0 0 0.0,
+              Casillero 4.0 6.0 0 0.0,
+              Casillero 6.0 infinitoPositivo 0 0.0
+            ],
+      casilleros (agregar 2 (vacio 3 (0, 6)))
+        ~?= [ Casillero infinitoNegativo 0.0 0 0.0,
+              Casillero 0.0 2.0 0 0.0,
+              Casillero 2.0 4.0 1 100.0,
+              Casillero 4.0 6.0 0 0.0,
+              Casillero 6.0 infinitoPositivo 0 0.0
+            ]
+    ]
+
 --
 -- testsRecr :: Test
 -- testsRecr =
 --   test
---     [ completar
+--     [
 --     ]
 --
 -- testsFold :: Test
 -- testsFold =
 --   test
---     [ completar
+--     [
 --     ]
 --
--- testsEval :: Test
--- testsEval =
---   test
---     [ fst (eval (Suma (Rango 1 5) (Const 1)) genFijo) ~?= 4.0,
---       fst (eval (Suma (Rango 1 5) (Const 1)) (genNormalConSemilla 0)) ~?= 3.7980492,
---       -- el primer rango evalua a 2.7980492 y el segundo a 3.1250308
---       fst (eval (Suma (Rango 1 5) (Rango 1 5)) (genNormalConSemilla 0)) ~?= 5.92308,
---       completar
---     ]
+testsEval :: Test
+testsEval =
+  test
+    [ fst (eval (Suma (Rango 1 5) (Const 1)) genFijo) ~?= 4.0,
+      fst (eval (Suma (Rango 1 5) (Const 1)) (genNormalConSemilla 0)) ~?= 3.7980492,
+      -- el primer rango evalua a 2.7980492 y el segundo a 3.1250308
+      fst (eval (Suma (Rango 1 5) (Rango 1 5)) (genNormalConSemilla 0)) ~?= 5.92308
+    ]
+
 --
 -- testsArmarHistograma :: Test
 -- testsArmarHistograma =
 --   test
---     [completar]
+--     []
 --
 -- testsEvalHistograma :: Test
 -- testsEvalHistograma =
 --   test
---     [completar]
+--     []
 --
 -- testsParse :: Test
 -- testsParse =
