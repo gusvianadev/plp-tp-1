@@ -26,10 +26,10 @@ allTests =
       "Ej 8 - Expr.eval" ~: testsEval,
       -- "Ej 9 - Expr.armarHistograma" ~: testsArmarHistograma,
       -- "Ej 10 - Expr.evalHistograma" ~: testsEvalHistograma,
-      "Ej 11 - Expr.mostrar" ~: testsMostrar
-      -- "Expr.Parser.parse" ~: testsParse,
-      -- "App.mostrarFloat" ~: testsMostrarFloat,
-      -- "App.mostrarHistograma" ~: testsMostrarHistograma
+      "Ej 11 - Expr.mostrar" ~: testsMostrar,
+      "Expr.Parser.parse" ~: testsParse,
+      "App.mostrarFloat" ~: testsMostrarFloat,
+      "App.mostrarHistograma" ~: testsMostrarHistograma
     ]
 
 testsAlinearDerecha :: Test
@@ -85,6 +85,13 @@ testsAgregar =
             ~?= [ Casillero infinitoNegativo 0 1 100, -- El 100% de los valores están acá
                   Casillero 0 2 0 0,
                   Casillero 2 4 0 0,
+                  Casillero 4 6 0 0,
+                  Casillero 6 infinitoPositivo 0 0
+                ],
+          casilleros (agregar 2 (agregar (-1) h0))
+            ~?= [ Casillero infinitoNegativo 0 1 50, -- El 100% de los valores están acá
+                  Casillero 0 2 0 0,
+                  Casillero 2 4 1 50,
                   Casillero 4 6 0 0,
                   Casillero 6 infinitoPositivo 0 0
                 ]
@@ -148,23 +155,23 @@ testsEval =
 --   test
 --     []
 --
--- testsParse :: Test
--- testsParse =
---   test
---     [ parse "1" ~?= Const 1.0,
---       parse "-1.7 ~ -0.5" ~?= Rango (-1.7) (-0.5),
---       parse "1+2" ~?= Suma (Const 1.0) (Const 2.0),
---       parse "1 + 2" ~?= Suma (Const 1.0) (Const 2.0),
---       parse "1 + 2 * 3" ~?= Suma (Const 1.0) (Mult (Const 2.0) (Const 3.0)),
---       parse "1 + 2 + 3" ~?= Suma (Suma (Const 1.0) (Const 2.0)) (Const 3.0),
---       parse "1 + (2 + 3)" ~?= Suma (Const 1.0) (Suma (Const 2.0) (Const 3.0)),
---       parse "1 + 2 ~ 3 + 4" ~?= Suma (Suma (Const 1.0) (Rango 2.0 3.0)) (Const 4.0),
---       parse "1 - 2 - 3 - 4" ~?= Resta (Resta (Resta (Const 1.0) (Const 2.0)) (Const 3.0)) (Const 4.0),
---       parse "(((1 - 2) - 3) - 4)" ~?= Resta (Resta (Resta (Const 1.0) (Const 2.0)) (Const 3.0)) (Const 4.0),
---       parse "1 " ~?= Const 1.0,
---       parse "   1    " ~?= Const 1.0
---     ]
---
+testsParse :: Test
+testsParse =
+  test
+    [ parse "1" ~?= Const 1.0,
+      parse "-1.7 ~ -0.5" ~?= Rango (-1.7) (-0.5),
+      parse "1+2" ~?= Suma (Const 1.0) (Const 2.0),
+      parse "1 + 2" ~?= Suma (Const 1.0) (Const 2.0),
+      parse "1 + 2 * 3" ~?= Suma (Const 1.0) (Mult (Const 2.0) (Const 3.0)),
+      parse "1 + 2 + 3" ~?= Suma (Suma (Const 1.0) (Const 2.0)) (Const 3.0),
+      parse "1 + (2 + 3)" ~?= Suma (Const 1.0) (Suma (Const 2.0) (Const 3.0)),
+      parse "1 + 2 ~ 3 + 4" ~?= Suma (Suma (Const 1.0) (Rango 2.0 3.0)) (Const 4.0),
+      parse "1 - 2 - 3 - 4" ~?= Resta (Resta (Resta (Const 1.0) (Const 2.0)) (Const 3.0)) (Const 4.0),
+      parse "(((1 - 2) - 3) - 4)" ~?= Resta (Resta (Resta (Const 1.0) (Const 2.0)) (Const 3.0)) (Const 4.0),
+      parse "1 " ~?= Const 1.0,
+      parse "   1    " ~?= Const 1.0
+    ]
+
 testsMostrar :: Test
 testsMostrar =
   test
@@ -192,39 +199,39 @@ testsMostrar =
         ~?= "(1.0 + 2.0 + 3.0) * 4.0"
     ]
 
--- testsMostrarFloat :: Test
--- testsMostrarFloat =
---   test
---     [ mostrarFloat 0.0 ~?= "0.00",
---       mostrarFloat 1.0 ~?= "1.00",
---       mostrarFloat (-1.0) ~?= "-1.00",
---       -- Redondeo
---       mostrarFloat 3.14159 ~?= "3.14",
---       mostrarFloat 2.71828 ~?= "2.72",
---       mostrarFloat 0.000001 ~?= "1.00e-6",
---       mostrarFloat 100000 ~?= "100000.00",
---       -- Infinitos
---       mostrarFloat infinitoPositivo ~?= "+inf",
---       mostrarFloat infinitoNegativo ~?= "-inf"
---     ]
---
--- testsMostrarHistograma :: Test
--- testsMostrarHistograma =
---   let h0 = vacio 3 (0, 6)
---       h123 = agregar 1 (agregar 2 (agregar 3 h0))
---    in test
---         [ lines (mostrarHistograma h123)
---             ~?= [ "6.00 - +inf |",
---                   "4.00 - 6.00 |",
---                   "2.00 - 4.00 |▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒ 66.67%",
---                   "0.00 - 2.00 |▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒",
---                   "-inf - 0.00 |"
---                 ],
---           lines (mostrarHistograma (agregar 1 (vacio 3 (0, 1000))))
---             ~?= [ "  1000.00 - +inf |",
---                   "666.67 - 1000.00 |",
---                   " 333.33 - 666.67 |",
---                   "   0.00 - 333.33 |▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒ 100.00%",
---                   "     -inf - 0.00 |"
---                 ]
---         ]
+testsMostrarFloat :: Test
+testsMostrarFloat =
+  test
+    [ mostrarFloat 0.0 ~?= "0.00",
+      mostrarFloat 1.0 ~?= "1.00",
+      mostrarFloat (-1.0) ~?= "-1.00",
+      -- Redondeo
+      mostrarFloat 3.14159 ~?= "3.14",
+      mostrarFloat 2.71828 ~?= "2.72",
+      mostrarFloat 0.000001 ~?= "1.00e-6",
+      mostrarFloat 100000 ~?= "100000.00",
+      -- Infinitos
+      mostrarFloat infinitoPositivo ~?= "+inf",
+      mostrarFloat infinitoNegativo ~?= "-inf"
+    ]
+
+testsMostrarHistograma :: Test
+testsMostrarHistograma =
+  let h0 = vacio 3 (0, 6)
+      h123 = agregar 1 (agregar 2 (agregar 3 h0))
+   in test
+        [ lines (mostrarHistograma (agregar 1 (vacio 3 (0, 1000))))
+            ~?= [ "  1000.00 - +inf |",
+                  "666.67 - 1000.00 |",
+                  " 333.33 - 666.67 |",
+                  "   0.00 - 333.33 |▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒ 100.00%",
+                  "     -inf - 0.00 |"
+                ],
+          lines (mostrarHistograma h123)
+            ~?= [ "6.00 - +inf |",
+                  "4.00 - 6.00 |",
+                  "2.00 - 4.00 |▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒ 66.67%",
+                  "0.00 - 2.00 |▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒",
+                  "-inf - 0.00 |"
+                ]
+        ]
