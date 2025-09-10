@@ -69,6 +69,6 @@ casPorcentaje (Casillero _ _ _ p) = p
 casilleros :: Histograma -> [Casillero]
 casilleros (Histograma i t cs) = zipWith (\pos x -> Casillero (minimo pos) (maximo pos) x (porcentaje x)) [0 ..] cs
   where
-    porcentaje x = fromIntegral x * 100 / fromIntegral (sum cs)
+    porcentaje x = if x == 0 then 0 else fromIntegral x * 100 / fromIntegral (sum cs)
     minimo pos = if pos == 0 then infinitoNegativo else i + t * fromIntegral (pos - 1)
     maximo pos = if pos == (length cs - 1) then infinitoPositivo else i + t * fromIntegral pos
