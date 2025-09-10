@@ -50,7 +50,7 @@ foldExpr fCte fRango fSuma fResta fMult fDiv expr = case expr of
 
 -- | Evaluar expresiones dado un generador de números aleatorios
 eval :: Expr -> G Float
-eval expr gen =
+eval =
   foldExpr
     (\x g -> (x, g))
     (\x y g -> dameUno (x, y) g)
@@ -58,8 +58,6 @@ eval expr gen =
     (generar (-))
     (generar (*))
     (generar (/))
-    expr
-    gen
   where
     generar :: (Float -> Float -> Float) -> G Float -> G Float -> G Float
     generar f genX genY g =
@@ -70,13 +68,16 @@ eval expr gen =
 -- | @armarHistograma m n f g@ arma un histograma con @m@ casilleros
 -- a partir del resultado de tomar @n@ muestras de @f@ usando el generador @g@.
 armarHistograma :: Int -> Int -> G Float -> G Histograma
-armarHistograma m n f g = error "COMPLETAR EJERCICIO 9"
+armarHistograma m n f g = (histograma m rango muestrasGeneradas, generadorFinal)
+  where
+    (muestrasGeneradas, generadorFinal) = muestra f n g
+    rango = rango95 muestrasGeneradas
 
 -- | @evalHistograma m n e g@ evalúa la expresión @e@ usando el generador @g@ @n@ veces
 -- devuelve un histograma con @m@ casilleros y rango calculado con @rango95@ para abarcar el 95% de confianza de los valores.
 -- @n@ debe ser mayor que 0.
 evalHistograma :: Int -> Int -> Expr -> G Histograma
-evalHistograma m n expr = error "COMPLETAR EJERCICIO 10"
+evalHistograma m n expr = armarHistograma m n (eval expr)
 
 -- Podemos armar histogramas que muestren las n evaluaciones en m casilleros.
 -- >>> evalHistograma 11 10 (Suma (Rango 1 5) (Rango 100 105)) (genNormalConSemilla 0)
@@ -87,8 +88,43 @@ evalHistograma m n expr = error "COMPLETAR EJERCICIO 10"
 
 -- | Mostrar las expresiones, pero evitando algunos paréntesis innecesarios.
 -- En particular queremos evitar paréntesis en sumas y productos anidados.
+--
+-- Const a
+--
+-- Rango \(Const a\) Expr
+-- Rango (_ Expr Expr) Expr
+--
+-- Suma \(Const a\) Expr
+-- Suma \(Suma Expr Expr\) Expr
+-- Suma (_ Expr Expr) Expr
+--
+-- Resta \(Const a\) Expr
+-- Resta (_ Expr Expr) Expr
+--
+-- Mul \(Const a\) Expr
+-- Mul \(Mul Expr Expr\) Expr
+-- Mul (_ Expr Expr) Expr
+--
+-- Div \(Const a\) Expr
+-- Div (_ Expr Expr) Expr
 mostrar :: Expr -> String
-mostrar = error "COMPLETAR EJERCICIO 11"
+mostrar =
+  recrExpr
+    show
+    (\x y -> show x ++ "~" ++ show y)
+    (evaluarMaybes CESuma " + ")
+    (evaluarMaybes CEResta " - ")
+    (evaluarMaybes CEMult " * ")
+    (evaluarMaybes CEDiv " / ")
+  where
+    evaluarMaybes ePadre op eX eY rX rY = maybeParen (deberiaEncerrar eX ePadre) rX ++ op ++ maybeParen (deberiaEncerrar eY ePadre) rY
+    deberiaEncerrar ex ePadre = case constructor ex of
+      CEConst -> False
+      CERango -> False
+      CESuma -> ePadre /= CESuma
+      CEResta -> True
+      CEMult -> ePadre /= CEMult
+      CEDiv -> True
 
 data ConstructorExpr = CEConst | CERango | CESuma | CEResta | CEMult | CEDiv
   deriving (Show, Eq)

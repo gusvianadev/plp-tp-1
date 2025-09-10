@@ -67,9 +67,9 @@ casPorcentaje (Casillero _ _ _ p) = p
 
 -- | Dado un histograma, devuelve la lista de casilleros con sus límites, cantidad y porcentaje.
 casilleros :: Histograma -> [Casillero]
-casilleros (Histograma l u cs) = zipWith (\pos x -> Casillero (minimo pos) (maximo pos) x (porcentaje x)) [0 ..] cs
+casilleros (Histograma i t cs) = zipWith (\pos x -> Casillero (minimo pos) (maximo pos) x (porcentaje x)) [0 ..] cs
   where
     porcentaje :: Int -> Float
     porcentaje x = if x == 0 then 0 else fromIntegral (sum cs) * 100 / fromIntegral x
-    minimo pos = if pos == 0 then infinitoNegativo else l + u * fromIntegral (pos - 1)
-    maximo pos = if pos == (length cs - 1) then infinitoPositivo else l + u * fromIntegral pos
+    minimo pos = if pos == 0 then infinitoNegativo else i + t * fromIntegral (pos - 1)
+    maximo pos = if pos == (length cs - 1) then infinitoPositivo else i + t * fromIntegral pos
